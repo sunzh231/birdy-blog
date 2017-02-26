@@ -3,9 +3,9 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Birdy
-subtitle:
-description:
+title: Birdy Blog
+subtitle: 走别人没走过的路，让别人有路可走！
+description: qwewqewqewqewqewqewqewq
 author: Richard Sun
 language:
 timezone:
@@ -34,7 +34,7 @@ titlecase: false # Transform title into titlecase
 external_link: true # Open external links in new tab
 filename_case: 0
 render_drafts: false
-post_asset_folder: false
+post_asset_folder: true
 relative_link: false
 future: true
 highlight:
