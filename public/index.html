@@ -384,9 +384,63 @@
       
           
         <p>高可用系统搭建。</p>
-<h2 id="High-Avialible"><a href="#High-Avialible" class="headerlink" title="High Avialible"></a>High Avialible</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h2 id="High-Avialible"><a href="#High-Avialible" class="headerlink" title="High Avialible"></a>High Avialible</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>[cluster] – 簇，集群。集群就是由一些互相连接在一起的计算机构成的一个并行或分布式系统，从外部来看，它们仅仅是一个系统，对外提供统一的服务。</p>
+<p>我们用到的集群系统主要就2种:</p>
+<blockquote>
+<p>1.高可用(High Availability)HA集群, 使用Heartbeat实现;也会称为”双机热备”, “双机互备”, “双机”。</p>
+<p>2.负载均衡群集(Load Balance Cluster)，使用Linux Virtual Server(LVS)实现;</p>
+</blockquote>
+<hr>
+<p>2种不同机制的双机系统：</p>
+<blockquote>
+<p><em>基于系统切换的双机系统(HA)</em><br>特点是利用双机，将系统的数据（仅指硬盘数据）进行镜像，在主机失效的情况下从机将进行系统一级的切换。 性能价格比适中，但无法实现无缝切换。</p>
+<p><em>基于系统镜像的双机系统(FT)</em><br>特点是利用双机，将系统的数据和运行状态（包括内存中的数据）进行镜像，从而实现热备份的目的。 能够做到无缝切换，但因为采用软件控制，占用系统资源较大，而且由于两台机器需要完全一样的配置，所以性能价格比太低。</p>
+</blockquote>
+<p>接下来是主要关于第一种 <em>基于系统切换的双机系统(HA)</em> 的实现方案：</p>
+<p>[HeartBeat] - Heartbeat is a daemon that provides cluster infrastructure (communication and membership) services to its clients. This allows clients to know about the presence (or disappearance!) of peer processes on other machines and to easily exchange messages with them.</p>
+<p>[DRBD] - The Distributed Replicated Block Device (DRBD) is a software-based, shared-nothing, replicated storage solution mirroring the content of block devices (hard disks, partitions, logical volumes etc.) between servers.</p>
+<p>[VIP] - virtual IP</p>
+<h3 id="DRDB"><a href="#DRDB" class="headerlink" title="DRDB"></a>DRDB</h3><p><img src="/images/ha/drbd.png" alt="DRDB 双机架构图"></p>
+<h4 id="Recovery"><a href="#Recovery" class="headerlink" title="Recovery"></a><strong>Recovery</strong></h4><ol>
+<li><p><em>After a node outage</em></p>
+<blockquote>
+<p>After an outage of a node DRBD® automatically resynchronizes the temporarily unavailable node to the latest version of the data, in the background, without interfering with the service running. Of course this also works if the role of the surviving node was changed while the peer was down.<br>In case a complete power outage takes both nodes down, DRBD will detect which of the nodes was down longer, and will do the resynchronization in the right direction.</p>
+</blockquote>
+</li>
+<li><p><em>After an outage of the replication network</em></p>
+<blockquote>
+<p>DRBD will reestablish the connection and do the necessary resynchronization automatically.</p>
+</blockquote>
+</li>
+<li><p><em>After an outage of a storage subsystem</em></p>
+<blockquote>
+<p>DRBD can mask the failure of a disk on the active node, i.e., the service can continue to run there, without needing to failover the service. If the disk can be replaced without shutting down the machine, it can be reattached to DRBD. DRBD resynchronizes the data as needed to the replacement disk.</p>
+</blockquote>
+</li>
+<li><p><em>After an outage of all network links</em></p>
+<blockquote>
+<p>DRBD supports you with various automatic and manual recovery options in the event of split brain.<br>Split brain is a situation where, due to the temporary failure of all network links between cluster nodes, and possibly due to intervention by cluster management software or human error, both nodes switched to the primary role while disconnected. This is a potentially harmful state, as it implies that modifications to the data might have been made on either node, without having been replicated to the peer. Thus, it is likely in this situation that two diverging sets of data have been created that cannot be merged.</p>
+</blockquote>
+</li>
+</ol>
+<h4 id="DRBD-mirrors-data"><a href="#DRBD-mirrors-data" class="headerlink" title="DRBD mirrors data"></a><strong>DRBD mirrors data</strong></h4><ol>
+<li>In real time. Replication occurs continuously, while applications modify the data on the device.</li>
+<li>Transparently. The applications that store their data on the mirrored device are oblivious of the fact that the data is in fact stored on several computers.</li>
+<li>Synchronously or asynchronously. With synchronous mirroring, a writing application is notified of write completion only after the write has been carried out on both computer systems. Asynchronous mirroring means the writing application is notified of write completion when the write has completed locally, but before the write has propagated to the peer system.</li>
+</ol>
+<p><img src="/images/ha/drbd_three_node.png" alt="DRDB第三节点容灾策略"></p>
+<p>更多:<br><a href="http://www.drbd.org/en/doc/users-guide-90" target="_blank" rel="external">DRBD官网</a></p>
+<h3 id="Heartbeat"><a href="#Heartbeat" class="headerlink" title="Heartbeat"></a>Heartbeat</h3><p><strong>heartbeat （Linux-HA）的工作原理：</strong></p>
+<blockquote>
+<p>heartbeat最核心的包括两个部分，心跳监测部分和资源接管部分，心跳监测可以通过网络链路和串口进行，而且支持冗余链路，它们之间相互发送报文来告诉对方自己当前的状态，如果在指定的时间内未受到对方发送的报文，那么就认为对方失效，这时需启动资源接管模块来接管运 行在对方主机上的资源或者服务。</p>
+</blockquote>
+<p><img src="/images/ha/ha.png" alt="Heatbeat架构图"></p>
+<p>更多: <a href="http://www.linux-ha.org/doc/users-guide/users-guide.html" target="_blank" rel="external">Heartbeat官网</a></p>
 <h3 id="搭建过程"><a href="#搭建过程" class="headerlink" title="搭建过程"></a>搭建过程</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="搭建过程-1"><a href="#搭建过程-1" class="headerlink" title="搭建过程"></a>搭建过程</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
+<h3 id="搭建过程-2"><a href="#搭建过程-2" class="headerlink" title="搭建过程"></a>搭建过程</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ hexo new <span class="string">"My New Post"</span></div></pre></td></tr></table></figure>
 <p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="external">Writing</a></p>
 
       
