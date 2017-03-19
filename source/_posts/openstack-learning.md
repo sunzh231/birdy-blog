@@ -1,6 +1,6 @@
 ---
 title: openstack 学习笔记
-date: 2017-02-26 22:02:00
+date: 2016-03-06 18:02:00
 categories:
 - openstack
 tags:

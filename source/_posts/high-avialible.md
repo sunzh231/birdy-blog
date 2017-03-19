@@ -1,6 +1,6 @@
 ---
 title: HA（高可用）解决方案
-date: 2017-02-26 22:10:18
+date: 2016-03-21 09:10:18
 categories:
 - HA
 tags:
