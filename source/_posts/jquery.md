@@ -1,5 +1,5 @@
 ---
-title: jquery
+title: JQuery & JQuery Plugin
 date: 2017-03-27 11:31:57
 categories:
 - 前端
