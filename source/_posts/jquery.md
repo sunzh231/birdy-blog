@@ -54,7 +54,7 @@ draggable demo: [DEMO](http://www.jqueryui.org.cn/demo/5611.html)
 ### droppable
 **放置组件**
 
-```
+``` javascript
 $( ".selector" ).droppable({
   ...
 });
@@ -65,7 +65,7 @@ droppable demo: [DEMO](http://www.jqueryui.org.cn/demo/5622.html)
 ### sortable
 **排序组件**
 
-```
+``` javascript
 $( ".selector" ).sortable({
   ...
 });
@@ -74,3 +74,56 @@ $( ".selector" ).sortable({
 sortable demo: [DEMO](http://www.jqueryui.org.cn/demo/5643.html)
 
 ### draggable + droppable + sortable
+
+``` javascript
+$('.draggable').draggable
+  helper: 'clone'
+  zIndex: 9999
+  scroll: true
+  connectToSortable: '.droppable-wrap'
+
+$('.droppable-wrap').droppable(
+  accept: '.draggable'
+).sortable(
+  handle: '.title-wrap'
+  items: '.question-wrap'
+  axis: 'y'
+  appendTo: 'parent'
+  scroll: false
+  receive: (event, ui) ->
+    question_count++
+    if ui.helper.context.id == 'singleselect'
+      target = HandlebarsTemplates['questionnaires/select']({
+        type: ui.helper.context.id,
+        type_no: 1,
+        index: question_count
+      })
+    if ui.helper.context.id == 'vote'
+      target = HandlebarsTemplates['questionnaires/select']({
+        type: ui.helper.context.id,
+        type_no: 2,
+        index: question_count
+      })
+    if ui.helper.context.id == 'multiselect'
+      target = HandlebarsTemplates['questionnaires/select']({
+        type: ui.helper.context.id,
+        type_no: 3,
+        index: question_count
+      })
+    if ui.helper.context.id == 'grade'
+      target = HandlebarsTemplates['questionnaires/grade']({
+        type: ui.helper.context.id,
+        type_no: 4,
+        index: question_count })
+    if ui.helper.context.id == 'fill_in'
+      target = HandlebarsTemplates['questionnaires/fill_in']({
+        type: ui.helper.context.id,
+        type_no: 5,
+        index: question_count })
+    $('.droppable-wrap').find('.draggable').before(target)
+    $('.droppable-wrap').find('.draggable').remove()
+  update: (event, ui) ->
+    $('.no-question').remove()
+    update_sort_no()
+).disableSelection()
+```
