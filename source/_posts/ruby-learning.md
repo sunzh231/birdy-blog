@@ -1,5 +1,5 @@
 ---
-title: Ruby & Rails 的学习历程
+title: 我的全栈工程师之路 (Ruby on Rails)
 date: 2017-01-31 06:28:39
 categories:
 - Ruby
@@ -8,27 +8,18 @@ tags:
 - 语言学习
 ---
 
-与其是学习Ruby, 不如说为了Rails而学习Ruby。
 
 ## Ruby
 
 ### Ruby基础
 
-``` bash
-$ hexo new "My New Post"
-```
+很遗憾，到目前为止都没能完整的看完一边Ruby的基础语法，此处深深忏悔五分钟。。。
 
-More info: [Writing](https://hexo.io/docs/writing.html)
+就先放个Ruby的官方文档充充数吧～
 
-### Ruby进阶
+相关链接: [Ruby2.4](http://doc.rubyfans.com/ruby/v2.4/)
 
-``` bash
-$ hexo new "My New Post"
-```
-
-More info: [Writing](https://hexo.io/docs/writing.html)
-
-### Ruby高级
+### Ruby高级运用
 
 ``` bash
 $ hexo new "My New Post"
@@ -52,7 +43,7 @@ More info: [Writing](https://hexo.io/docs/writing.html)
 $ hexo new "My New Post"
 ```
 
-More info: [Writing](https://hexo.io/docs/writing.html)
+相关链接: [Rails5.1](http://guides.ruby-china.org/index.html)
 
 ### Rails进阶
 

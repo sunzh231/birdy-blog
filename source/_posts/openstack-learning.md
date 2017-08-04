@@ -63,5 +63,3 @@ ZeroMQ 高性能异步消息库。没有Server/Broker，消息发送者负责消
 ## Openstack
 
 ### 什么是openstack
-
-因此，openstack中的RPC采用AMQP实现进程间的通信。
