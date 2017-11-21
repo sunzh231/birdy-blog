@@ -1,14 +1,19 @@
 ---
-title: Atom编辑器使用笔记
+title: 代码编辑器使用笔记
 date: 2017-04-26 14:36:11
 categories:
 - tools
 tags:
 - 编辑器
+- vscode
 - atom
 ---
+## vscode
 
-## 常用快捷键
+### 基础快捷键
+正在完善...
+
+## atom
 
 ### 基础快捷键
   `ctrl+g` 跳转到行
@@ -46,8 +51,6 @@ tags:
 ### 插件快捷键
   `ctrl+alt+a` 添加tab标记
   `ctrl+alt+x` 去除tab标记
-
-## DIY配置
 
 ### 不错的几个插件
 
